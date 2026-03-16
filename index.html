@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Sorteio ao Vivo – Faculdade Moinhos de Vento</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Fonts: Ubuntu + Philosopher -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --destaque: #2935C;      /* PANTONE 2935 C – azul principal */
+  --destaque: #003DA5;     /* fallback CMYK C100 M60 Y00 K00 → ~#003DA5 */
+  --azul-principal: #003DA5;   /* PANTONE 2935 C  C100 M60 Y00 K00 */
+  --azul-escuro:   #00205B;    /* PANTONE Process 2955 C  C100 M55 Y10 K48 */
+  --azul-medio:    #0072CE;    /* PANTONE 2925 C  C84 M21 Y00 K00 */
+  --azul-ciano:    #00AEEF;    /* PANTONE Process Cyan C  C100 M00 Y00 K00 */
+  --azul-claro:    #6CACE4;    /* PANTONE Process 2915 C  C61 M07 Y00 K00 */
+  --azul-pastel:   #B8D4EA;    /* PANTONE Process 2905 C  C44 M02 Y00 K00 */
+  --azul-slate:    #5B7FA6;    /* PANTONE 646 C  C73 M50 Y05 K10 */
+  --destaque: var(--azul-principal);
+  --cinza: #777;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  font-family: 'Ubuntu', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* TOPO */
+header {
+  text-align: center;
+  padding-top: 32px;
+}
+
+header img {
+  height: 80px;
+  margin-bottom: 16px;
+}
+
+header h1 {
+  font-size: 40px;
+  font-weight: 700;
+  font-family: 'Philosopher', serif;
+  letter-spacing: 0.02em;
+}
+
+/* ÁREA CENTRAL */
+main {
+  height: calc(100vh - 200px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* LISTA */
+.lista-container {
+  position: absolute;
+  inset: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.lista-container::-webkit-scrollbar {
+  display: none;
+}
+
+.lista {
+  padding-top: 45vh;
+  padding-bottom: 45vh;
+  width: 100%;
+}
+
+.participante {
+  width: 100%;
+  text-align: center;
+  padding: 14px 0;
+  font-size: 28px;
+  color: #777;
+  transform: scale(0.7);
+  opacity: 0.2;
+  font-weight: normal;
+  font-family: 'Ubuntu', sans-serif;
+  will-change: transform, opacity, color;
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out,
+    color 0.2s ease-out;
+}
+
+/* ROLETA */
+.roleta {
+  position: absolute;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.roleta.ativo {
+  opacity: 1;
+}
+
+.roleta-nome {
+  font-size: 56px;
+  font-weight: 700;
+  font-family: 'Philosopher', serif;
+  color: #fff;
+  transition: transform 0.3s ease;
+}
+
+.vencedor {
+  color: var(--azul-ciano);
+  transform: scale(1.15);
+  animation: pulso 1.5s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%, 100% { transform: scale(1.15); }
+  50% { transform: scale(1.25); }
+}
+
+.parabens {
+  margin-top: 24px;
+  font-size: 26px;
+  font-family: 'Ubuntu', sans-serif;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.parabens.ativo {
+  opacity: 1;
+}
+
+/* CONFETE */
+.confete {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--azul-principal);
+  animation: cair 3s linear forwards;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes cair {
+  0% {
+    opacity: 1;
+    transform: translateY(-20px) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg);
+  }
+}
+
+/* BRILHO */
+.brilho {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 61, 165, 0.45) 0%, transparent 70%);
+  animation: brilhar 2s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.brilho.ativo {
+  opacity: 1;
+}
+
+@keyframes brilhar {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
+}
+
+/* BOTÃO */
+footer {
+  position: absolute;
+  bottom: 32px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  padding: 18px 36px;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: 'Ubuntu', sans-serif;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: var(--azul-principal);
+  color: #fff;
+  transition: opacity 1s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: var(--azul-medio);
+  transform: scale(1.05);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+/* MENSAGEM DE ERRO */
+.erro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 59, 48, 0.9);
+  padding: 24px 32px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.erro.ativo {
+  opacity: 1;
+}
+
+.erro h2 {
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-family: 'Philosopher', serif;
+}
+
+.erro p {
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+/* LOADING */
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  opacity: 0.7;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.loading::after {
+  content: '...';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="logo.png" alt="Faculdade Moinhos de Vento">
+  <h1>Sorteio ao Vivo</h1>
+</header>
+
+<main>
+
+  <div class="loading" id="loading">Carregando participantes</div>
+
+  <div class="erro" id="erro">
+    <h2>Erro ao carregar</h2>
+    <p>Não foi possível carregar a lista de participantes. Verifique sua conexão e tente novamente.</p>
+  </div>
+
+  <div class="lista-container" id="lista" style="opacity: 0;">
+    <div class="lista" id="listaInterna"></div>
+  </div>
+
+  <div class="roleta" id="roleta">
+    <div class="brilho" id="brilho"></div>
+    <div class="roleta-nome" id="roletaNome"></div>
+    <div class="parabens" id="parabens">
+      Parabéns, você é o ganhador(a) do sorteio!
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <button id="btnSortear" disabled>Carregando...</button>
+</footer>
+
+<audio id="click1" src="click1.mp3" preload="auto"></audio>
+<audio id="click2" src="click2.mp3" preload="auto"></audio>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-d16KOjhYvIm4KLp5FnvJW479ZZ6I5MJ-r734uCbPeiEEPrq66GN9uFp1wocuW0Ib1BGEcKTA-a4W/pub?output=csv";
+const COLUNA_NOME = 1;
+
+const lista = document.getElementById("lista");
+const listaInterna = document.getElementById("listaInterna");
+const btn = document.getElementById("btnSortear");
+const roleta = document.getElementById("roleta");
+const roletaNome = document.getElementById("roletaNome");
+const parabens = document.getElementById("parabens");
+const brilho = document.getElementById("brilho");
+const loading = document.getElementById("loading");
+const erro = document.getElementById("erro");
+
+const click1 = document.getElementById("click1");
+const click2 = document.getElementById("click2");
+
+let participantes = [];
+let participantesDOM = [];
+let indiceCentralAtual = null;
+let animationFrameId = null;
+
+/* ===== CSV COM TRATAMENTO DE ERRO ===== */
+async function carregarParticipantes() {
+  try {
+    const res = await fetch(CSV_URL);
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const texto = await res.text();
+    const linhas = texto.split("\n").slice(1);
+
+    if (linhas.length === 0) {
+      throw new Error("CSV vazio");
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    linhas.forEach(l => {
+      const cols = l.split(",");
+      const nome = cols[COLUNA_NOME]?.replace(/"/g, "").trim();
+      if (!nome) return;
+
+      participantes.push(nome);
+
+      const div = document.createElement("div");
+      div.className = "participante";
+      div.textContent = nome;
+      fragment.appendChild(div);
+      participantesDOM.push(div);
+    });
+
+    listaInterna.appendChild(fragment);
+
+    if (participantes.length === 0) {
+      throw new Error("Nenhum participante encontrado");
+    }
+
+    loading.style.opacity = 0;
+    setTimeout(() => {
+      loading.style.display = "none";
+      lista.style.opacity = 1;
+      btn.disabled = false;
+      btn.textContent = "Iniciar sorteio";
+    }, 500);
+
+    return true;
+
+  } catch (error) {
+    console.error("Erro ao carregar participantes:", error);
+    
+    loading.style.opacity = 0;
+    setTimeout(() => {
+      loading.style.display = "none";
+      erro.classList.add("ativo");
+    }, 500);
+    
+    return false;
+  }
+}
+
+/* ===== SOM SCROLL ===== */
+function tocarClickScroll() {
+  try {
+    const som = click1.cloneNode();
+    som.volume = 0.55;
+    som.play().catch(() => {});
+  } catch (e) {}
+}
+
+/* ===== LOOP OTIMIZADO (THROTTLED) ===== */
+let ultimoCalculo = 0;
+const INTERVALO_CALCULO = 16;
+
+function loopFoco() {
+  const agora = Date.now();
+  
+  if (agora - ultimoCalculo < INTERVALO_CALCULO) {
+    animationFrameId = requestAnimationFrame(loopFoco);
+    return;
+  }
+  
+  ultimoCalculo = agora;
+
+  const items = participantesDOM;
+  if (items.length === 0) return;
+  
+  const centroY = window.innerHeight / 2;
+  const maxTransicao = centroY * 1.35;
+
+  let menorDist = Infinity;
+  let indiceMaisProximo = null;
+
+  const itemsLength = items.length;
+  const calculos = new Array(itemsLength);
+  
+  for (let i = 0; i < itemsLength; i++) {
+    const p = items[i];
+    const rect = p.getBoundingClientRect();
+    const centro = rect.top + rect.height / 2;
+    const dist = Math.abs(centro - centroY);
+
+    if (dist < menorDist) {
+      menorDist = dist;
+      indiceMaisProximo = i;
+    }
+
+    const t = Math.max(0, 1 - dist / maxTransicao);
+    
+    calculos[i] = {
+      escala: 0.7 + t * 0.9,
+      opacidade: 0.2 + t * 0.8,
+      grayValue: 119 + Math.floor(t * 136)
+    };
+  }
+
+  for (let i = 0; i < itemsLength; i++) {
+    const p = items[i];
+    const calc = calculos[i];
+    
+    p.style.transform = `scale(${calc.escala})`;
+    p.style.opacity = calc.opacidade;
+    p.style.color = `rgb(${calc.grayValue}, ${calc.grayValue}, ${calc.grayValue})`;
+    p.style.fontWeight = 'normal';
+  }
+
+  if (indiceMaisProximo !== null) {
+    const p = items[indiceMaisProximo];
+    p.style.color = "#00AEEF"; /* azul ciano – destaque na lista */
+    p.style.fontWeight = "700";
+
+    if (indiceMaisProximo !== indiceCentralAtual && indiceCentralAtual !== null) {
+      tocarClickScroll();
+    }
+    
+    indiceCentralAtual = indiceMaisProximo;
+  }
+
+  animationFrameId = requestAnimationFrame(loopFoco);
+}
+
+/* ===== CONFETE ===== */
+const CORES_CONFETE = ['#003DA5', '#0072CE', '#00AEEF', '#6CACE4', '#B8D4EA', '#5B7FA6'];
+
+function criarConfete() {
+  for (let i = 0; i < 100; i++) {
+    setTimeout(() => {
+      const confete = document.createElement('div');
+      confete.className = 'confete';
+      confete.style.left = Math.random() * 100 + '%';
+      confete.style.top = '-20px';
+      confete.style.background = CORES_CONFETE[Math.floor(Math.random() * CORES_CONFETE.length)];
+      confete.style.width = (Math.random() * 10 + 5) + 'px';
+      confete.style.height = (Math.random() * 10 + 5) + 'px';
+      confete.style.animationDelay = (Math.random() * 0.5) + 's';
+      confete.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      
+      document.body.appendChild(confete);
+      
+      setTimeout(() => confete.remove(), 4000);
+    }, i * 20);
+  }
+}
+
+/* ===== SORTEIO ===== */
+btn.addEventListener("click", () => {
+  roletaNome.style.willChange = 'transform, opacity';
+  
+  btn.style.opacity = 0;
+  lista.style.opacity = 0;
+
+  setTimeout(() => {
+    lista.style.display = "none";
+    roleta.classList.add("ativo");
+    
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+    
+    iniciarRoleta();
+  }, 1000);
+});
+
+function iniciarRoleta() {
+  if (!participantes || participantes.length === 0) {
+    console.error('❌ Erro: Nenhum participante carregado!');
+    return;
+  }
+
+  const indiceVencedor = Math.floor(Math.random() * participantes.length);
+  const vencedor = participantes[indiceVencedor];
+  
+  console.log(`🎲 Vencedor sorteado: ${vencedor} (posição ${indiceVencedor + 1}/${participantes.length})`);
+  console.log(`📊 Total de participantes: ${participantes.length}`);
+  
+  let indice = Math.floor(Math.random() * participantes.length);
+  const inicio = Date.now();
+  const duracao = 12000;
+  const metade = 6000;
+  let contagemSons = 0;
+
+  function girar() {
+    const decorrido = Date.now() - inicio;
+    
+    if (decorrido > duracao) {
+      console.log(`🔊 Total de sons tocados: ${contagemSons}`);
+      finalizar(vencedor);
+      return;
+    }
+
+    const indiceAtual = indice % participantes.length;
+    const nomeAtual = participantes[indiceAtual];
+    
+    if (!nomeAtual) {
+      console.error(`❌ Nome inválido no índice ${indiceAtual}`);
+      return;
+    }
+
+    roletaNome.textContent = nomeAtual;
+    
+    try {
+      const somClone = click2.cloneNode();
+      somClone.volume = 0.8;
+      somClone.play().catch((err) => {
+        if (contagemSons < 5) {
+          console.warn('⚠️ Erro ao tocar som:', err);
+        }
+      });
+      contagemSons++;
+    } catch (e) {
+      if (contagemSons < 5) {
+        console.error('❌ Erro no try-catch do som:', e);
+      }
+    }
+
+    indice++;
+    
+    let velocidade;
+    
+    if (decorrido < metade) {
+      const progresso = decorrido / metade;
+      const curva = Math.pow(progresso, 2);
+      velocidade = 200 - (curva * 130);
+    } else {
+      const progresso = (decorrido - metade) / metade;
+      const curva = Math.pow(progresso, 2);
+      velocidade = 70 + (curva * 330);
+    }
+
+    setTimeout(girar, velocidade);
+  }
+  
+  girar();
+}
+
+function finalizar(nome) {
+  roletaNome.textContent = nome;
+  roletaNome.classList.add("vencedor");
+  
+  roletaNome.style.willChange = 'auto';
+  
+  brilho.classList.add("ativo");
+  
+  setTimeout(() => criarConfete(), 300);
+  
+  setTimeout(() => parabens.classList.add("ativo"), 1500);
+}
+
+/* INIT */
+carregarParticipantes().then(sucesso => {
+  if (sucesso) {
+    animationFrameId = requestAnimationFrame(loopFoco);
+  }
+});
+</script>
+
+</body>
+</html>
