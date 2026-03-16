@@ -124,7 +124,7 @@ main {
 .roleta-nome {
   font-size: 56px;
   font-weight: 700;
-  font-family: 'Philosopher', serif;
+  font-family: 'Ubuntu', sans-serif;
   color: #fff;
   transition: transform 0.3s ease;
 }
@@ -324,8 +324,8 @@ button:disabled {
 <audio id="click2" src="click2.mp3" preload="auto"></audio>
 
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8M708lA8ZEGVYlZU3TMEOLnYhbVTWvHKSCAJM59peRcbQLIHiRh7qQP-3IY7OalNt5hopiMgVFLNf/pub?output=csv";
-const COLUNA_NOME = 1;
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8M708lA8ZEGVYlZU3TMEOLnYhbVTWvHKSCAJM59peRcbQLIHiRh7qQP-3IY7OalNt5hopiMgVFLNf/pubhtml";
+const COLUNA_NOME = 2; // Coluna C (índice 2), ignorando cabeçalho da linha 1
 
 const lista = document.getElementById("lista");
 const listaInterna = document.getElementById("listaInterna");
